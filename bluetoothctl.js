@@ -1,11 +1,10 @@
-/**
- * Created by Jense Arntz on 03/12/17.
- */
-
 exports = module.exports = {};
 exports.Bluetooth = function () {
-
+    //sudo usermod -G bluetooth -a pi
+    //recommended sudo rpi-update
+    //echo -e "connect FC:8F:90:21:12:0C \nquit" | bluetoothctl
     var self = this;
+
     var events = require('events');
     events.EventEmitter.call(self);
     self.__proto__ = events.EventEmitter.prototype;
@@ -29,8 +28,8 @@ exports.Bluetooth = function () {
         DeviceSignalLevel: 'DeviceSignalLevel',
         Connected: 'Connected',
         Paired: 'Paired',
-        AlreadyScanning: 'AlreadyScanning'
-    };
+        ConnectError: 'ConnectError'
+    }
     var mydata = "";
     var devices = [];
     var controllers = [];
@@ -128,7 +127,9 @@ exports.Bluetooth = function () {
             term.write('agent on\r');
             setInterval(checkInfo, 5000, self)
         }
+
         //console.log("mydata:" + data)
+
         var regexdevice = /(\[[A-Z]{3,5}\])?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(?!RSSI)(?!Class)(?!Icon)(?!not available)(?!UUIDs:)(?!Connected)(?!Paired)(?![0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})(?!\s)(.+)/gm;
         var regexcontroller = /\[[A-Z]{3,5}\]?\s?Controller\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(?!Discovering)(.+) /gm;
         var regexsignal = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sRSSI:\s-(.+)/gm;
@@ -142,8 +143,12 @@ exports.Bluetooth = function () {
         var regexscanon1 = 'Discovery started';
         var regexscanon2 = 'Failed to start discovery: org.bluez.Error.InProgress';
         var regexscanon3 = 'Discovering: yes';
-        var regexscanoff1 = 'Discovery stopped'
+
+        var regexscanoff1 = 'Discovery stopped';
         var regexscanoff2 = 'Discovering: no';
+        var regexscanoff3 = 'Failed to stop discovery: org.bluez.Error.Failed';
+
+        var failToConnect = 'Failed to connect: org.bluez.Error.Failed';
 
         checkDevice(regexdevice, data);
         checkinfo(data);
@@ -154,9 +159,14 @@ exports.Bluetooth = function () {
         checkTrusted(regextrusted, data);
         checkBlocked(regexblocked, data);
 
-        if (data.indexOf(regexscanoff1) !== -1 || data.indexOf(regexscanoff2) !== -1)isScanning = false;
-        if (data.indexOf(regexscanon1) !== -1 || data.indexOf(regexscanon2) !== -1 || data.indexOf(regexscanon3) !== -1)isScanning = true;
-    });
+        if (data.indexOf(regexscanoff1) !== -1 || data.indexOf(regexscanoff2) !== -1 || data.indexOf(regexscanoff3) !== -1) {
+            isScanning = false;
+        }
+        if (data.indexOf(regexscanon1) !== -1 || data.indexOf(regexscanon2) !== -1 || data.indexOf(regexscanon3) !== -1) {
+            isScanning = true;
+        }
+        if (data.indexOf(failToConnect) !== -1) self.emit(bluetoothEvents.ConnectError);
+    })
 
 
     function checkBlocked(regstr, data) {
@@ -171,7 +181,7 @@ exports.Bluetooth = function () {
                 for (j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].blocked = m[2];
-                        console.log(m[1] + " blocked " + m[2]);
+                        console.log(m[1] + " blocked " + m[2])
                         self.emit(bluetoothEvents.Device, devices)
                     }
                 }
@@ -212,7 +222,7 @@ exports.Bluetooth = function () {
                     if (devices[j].mac == m[1]) {
                         devices[j].trusted = m[2];
                         console.log(m[1] + " trusted " + m[2])
-                        self.emit(bluetoothEvents.Device, devices)
+                        self.emit(bluetoothEvents.Device, device)
 
                     }
                 }
@@ -231,9 +241,12 @@ exports.Bluetooth = function () {
             if (devices.length > 0) {
                 for (j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
-                        devices[j].connected = m[2];
-                        console.log(m[1] + " connected " + m[2])
-                        self.emit(bluetoothEvents.Device, devices)
+                        console.log(m[1] + " connected " + m[2]);
+                        if (devices[j].connected != m[2]) {
+                            devices[j].connected = m[2];
+                            self.emit(bluetoothEvents.Connected, devices[j]);
+                        }
+                        self.emit(bluetoothEvents.Device, devices);
                     }
                 }
             }
@@ -260,15 +273,15 @@ exports.Bluetooth = function () {
             if (devices.length > 0) {
                 for (j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
-                        devices[j].name = m[3];
-                        devices[j].class = m[4];
-                        devices[j].icon = m[5];
-                        devices[j].paired = m[6];
-                        devices[j].trusted = m[7];
-                        devices[j].blocked = m[8];
-                        devices[j].connected = m[9];
-                        self.emit(bluetoothEvents.Device, devices);
-                        console.log ('info received:' + JSON.stringify(devices[j]))
+                        devices[j].name = m[3]
+                        devices[j].class = m[4]
+                        devices[j].icon = m[5]
+                        devices[j].paired = m[6]
+                        devices[j].trusted = m[7]
+                        devices[j].blocked = m[8]
+                        devices[j].connected = m[9]
+                        self.emit(bluetoothEvents.Device, devices)
+                        //console.log ('info received:' + JSON.stringify(devices[j]))
                     }
                 }
             }
@@ -286,9 +299,10 @@ exports.Bluetooth = function () {
             if (devices.length > 0) {
                 for (j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
-                        devices[j].signal = parseInt(m[2]);
+                        devices[j].signal = parseInt(m[2])
+                        devices[j].available = true
                         //console.log('signal level of:' + m[1] + ' is ' + m[2])
-                        self.emit(bluetoothEvents.Device, devices);
+                        self.emit(bluetoothEvents.Device, devices)
                         self.emit(bluetoothEvents.DeviceSignalLevel, devices, m[1], m[2]);
                     }
                 }
@@ -342,7 +356,7 @@ exports.Bluetooth = function () {
                     }
                 }
                 if (!found) {
-                    console.log('adding device ' + m[2]);
+                    console.log('adding device ' + m[2])
                     devices.push({
                         mac: m[2],
                         name: m[3],
@@ -361,75 +375,76 @@ exports.Bluetooth = function () {
         if ((regstr.exec(data)) !== null) self.emit(bluetoothEvents.Device, devices)
 
     }
-};
+}
 
 //region exports
 
 exports.agent = function (start) {
     this.term.write('agent ' + (start ? 'on' : 'off') + '\r');
-};
+}
 
 exports.power = function (start) {
     this.term.write('power ' + (start ? 'on' : 'off') + '\r');
-};
+}
 
 exports.scan = function (startScan) {
     this.term.write('scan ' + (startScan ? 'on' : 'off') + '\r');
-};
+}
+
 exports.pairable = function (canpairable) {
     this.term.write('pairable ' + (canpairable ? 'on' : 'off') + '\r');
-};
+}
+
 exports.discoverable = function (candiscoverable) {
     this.term.write('discoverable ' + (candiscoverable ? 'on' : 'off') + '\r');
-};
+}
 
 
 exports.pair = function (macID) {
     this.term.write('pair ' + macID + '\r');
-};
+}
+
 exports.trust = function (macID) {
     this.term.write('trust ' + macID + '\r');
-};
+}
 
 exports.untrust = function (macID) {
     this.term.write('untrust ' + macID + '\r');
-};
-
+}
 
 exports.block = function (macID) {
     this.term.write('block ' + macID + '\r');
-};
+}
+
 exports.unblock = function (macID) {
     this.term.write('unblock ' + macID + '\r');
-};
-
+}
 
 exports.connect = function (macID) {
     this.term.write('connect ' + macID + '\r');
-};
+}
 
 exports.disconnect = function (macID) {
     this.term.write('disconnect ' + macID + '\r');
-};
+}
 
 exports.remove = function (macID) {
     this.term.write('remove ' + macID + '\r');
-};
+}
 
 exports.info = function (macID) {
     this.term.write('info ' + macID + '\r');
-};
-
+}
 
 exports.getPairedDevices = function () {
     this.devices = [];
     this.term.write('paired-devices\r');
-};
+}
 
 exports.getDevicesFromController = function () {
     this.devices = [];
     this.term.write('devices\r');
-};
+}
 
 exports.checkBluetoothController=function(){
     try{
@@ -439,6 +454,5 @@ exports.checkBluetoothController=function(){
     catch(e){
         return false;
     }
-};
+}
 
-//endregion
