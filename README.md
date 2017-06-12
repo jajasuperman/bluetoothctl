@@ -40,6 +40,10 @@ example install process:  sudo apt-get install bluez blueman alsa-utils bluez-al
 - DeviceSignalLevel: event fires when a discoverable bluetooth device's signal level detected.
 
 - Device: event fires when a new device found or a device sends its features
+
+- Connected: event fires when a new device connected value has change (connected "yes" or "no") and return the device
+
+- ConnectError: event fires when a connection error is detected (Failed to connect: org.bluez.Error.Failed)
  
 **Basic usage**
  
