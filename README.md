@@ -44,6 +44,10 @@ example install process:  sudo apt-get install bluez blueman alsa-utils bluez-al
 - Connected: event fires when a new device connected value has change (connected "yes" or "no") and return the device
 
 - ConnectError: event fires when a connection error is detected (Failed to connect: org.bluez.Error.Failed)
+
+**Installation**
+
+Execute: ```npm install https://github.com/jajasuperman/bluetoothctl/tarball/master```
  
 **Basic usage**
  
