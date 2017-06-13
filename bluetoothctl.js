@@ -222,7 +222,7 @@ exports.Bluetooth = function () {
                     if (devices[j].mac == m[1]) {
                         devices[j].trusted = m[2];
                         console.log(m[1] + " trusted " + m[2])
-                        self.emit(bluetoothEvents.Device, device)
+                        self.emit(bluetoothEvents.Device, devices)
 
                     }
                 }
