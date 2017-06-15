@@ -22,13 +22,24 @@ exports.Bluetooth = function () {
         env: process.env
     });
 
+    var agents = [
+                    "DisplayOnly",      // 0
+                    "DisplayYesNo",     // 1
+                    "KeyboardDisplay",  // 2
+                    "KeyboardOnly",     // 3
+                    "NoInputNoOutput",  // 4
+                    "off",              // 5
+                    "on"                // 6
+                ];
+
     var bluetoothEvents = {
         Device: 'DeviceEvent',
         Controller: 'ControllerEvent',
         DeviceSignalLevel: 'DeviceSignalLevel',
         Connected: 'Connected',
+        ConnectError: 'ConnectError',
         Paired: 'Paired',
-        ConnectError: 'ConnectError'
+        Pairederror: 'PairedError'
     }
     var mydata = "";
     var devices = [];
@@ -97,6 +108,15 @@ exports.Bluetooth = function () {
         }
     });
 
+    Object.defineProperty(this, 'agents', {
+        get: function () {
+            return agents;
+        },
+        set: function (value) {
+            agents = value;
+        }
+    });
+
     function checkInfo(obj) {
         if (obj.devices.length > 0) {
             for (i = 0; i < obj.devices.length; i++) {
@@ -124,10 +144,11 @@ exports.Bluetooth = function () {
             console.log('bluetooth controller exists')
             term.write('bluetoothctl\r');
             term.write('power on\r');
-            term.write('agent on\r');
+            checkInfo(self);
             setInterval(checkInfo, 5000, self)
         }
 
+        // LOG
         //console.log("mydata:" + data)
 
         var regexdevice = /(\[[A-Z]{3,5}\])?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(?!RSSI)(?!Class)(?!Icon)(?!not available)(?!UUIDs:)(?!Connected)(?!Paired)(?![0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})(?!\s)(.+)/gm;
@@ -149,6 +170,7 @@ exports.Bluetooth = function () {
         var regexscanoff3 = 'Failed to stop discovery: org.bluez.Error.Failed';
 
         var failToConnect = 'Failed to connect: org.bluez.Error.Failed';
+        var failToPair = 'Failed to pair: org.bluez.Error.AuthenticationFailed'
 
         checkDevice(regexdevice, data);
         checkinfo(data);
@@ -165,7 +187,7 @@ exports.Bluetooth = function () {
         if (data.indexOf(regexscanon1) !== -1 || data.indexOf(regexscanon2) !== -1 || data.indexOf(regexscanon3) !== -1) {
             isScanning = true;
         }
-        if (data.indexOf(failToConnect) !== -1) self.emit(bluetoothEvents.ConnectError);
+        if (data.indexOf(failToConnect) !== -1 || data.indexOf(failToPair) !== -1) self.emit(bluetoothEvents.ConnectError);
     })
 
 
@@ -202,7 +224,7 @@ exports.Bluetooth = function () {
                     if (devices[j].mac == m[1]) {
                         devices[j].paired = m[2];
                         console.log(m[1] + " paired " + m[2])
-                        self.emit(bluetoothEvents.Device, devices)
+                        self.emit(bluetoothEvents.Paired, devices[j])
                     }
                 }
             }
@@ -281,7 +303,6 @@ exports.Bluetooth = function () {
                         devices[j].blocked = m[8]
                         devices[j].connected = m[9]
                         self.emit(bluetoothEvents.Device, devices)
-                        //console.log ('info received:' + JSON.stringify(devices[j]))
                     }
                 }
             }
@@ -320,10 +341,9 @@ exports.Bluetooth = function () {
             //m[2] - controllername
             controllers = [];
             controllers.push({mac: m[1], name: m[2]});
+            term.write('power on\r');
             self.emit(bluetoothEvents.Controller, controllers);
             //console.log('controller found:' + m[1])
-            term.write('power on\r');
-            term.write('agent on\r');
 
         }
     }
@@ -379,8 +399,9 @@ exports.Bluetooth = function () {
 
 //region exports
 
-exports.agent = function (start) {
-    this.term.write('agent ' + (start ? 'on' : 'off') + '\r');
+exports.agent = function (index) {
+    if(index < 0 || index > 6) {index = 0;}
+    this.term.write('agent ' + this.agents[index] + '\r');
 }
 
 exports.power = function (start) {
