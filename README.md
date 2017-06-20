@@ -1,56 +1,55 @@
-**Linux command line bluetoothctl wrapper for nodejs**
+### Linux command line bluetoothctl wrapper for nodejs
+Powerful command line utulity bluetoothctl for discovery, connect,disconnect, scan, pair etc.. 
+If you want to connect bluetooth speakers , mouse, keyboard etc.. you can use this module. 
 
-powerful command line utulity bluetoothctl for discovery, connect,disconnect, scan, pair etc.. 
-if you want to connect bluetooth speakers , mouse, keyboard etc.. you can use this module. 
-you must install bluetoothctl . for raspberry pi 3 , it comes as default with raspbian.
-example install process:  sudo apt-get install bluez blueman alsa-utils bluez-alsa
+### Requirements
+- Linux command line.
+- Bluetooth controller.
+- `bluetoothctl` package installed (comes with `bluez` package).
 
-**Features:**
+### Features:
+- **agent(agentId)** : set agent
+    - 0 = "DisplayOnly"
+    - 1 = "DisplayYesNo"
+    - 2 = "KeyboardDisplay
+    - 3 = "KeyboardOnly"
+    - 4 = "NoInputNoOutput"
+    - 5 = "off"
+    - 6 = "on"
+- **power(bool)** : set power on or off
+- **checkBluetoothController()** : checks if bluetooth controler exists or not
+- **getPairedDevices()** : checks already paired devices. 
+- **getDevicesFromController()** : checks already scanned devices.
+- **disconnect(macID)** : disconnect from macID
+- **info(macID)** : checks features of device with given macID
+- **pair(macID)** : pairs with given macID
+- **trust(macID)** : trust with given macID
+- **block(macID)** : block given macID
+- **unblock(macID)** : unblock given macID
+- **untrust(macID)** : untrust with given macID
+- **connect(macID)** : connect given macID
+- **disconnect(macID)** : disconnect with given macID
+- **remove(macID)** : remove given macID
+- **scan(bool)** : starts or stops scanning of bluetooth devices. while scan is set true, current audio playback might get crackling.. so stop scan after you found what you are searching.
+- **pairable(bool)** : sets your bluetooth controller as pairable
+- **discoverable(bool)** : sets bluetooth controller as discoverable.
+- **isScanning** : checks if bluetoothctl is already scanning. returns true/false
+- **isBluetoothReady** : checks if our bluetooth controller ready.returns true/false
+- **isBluetoothControlExists** : checks if we have a bluetooth hardware or not. 
+- **devices** : returns the scanned and found devices as array. example output at below..
+- **controllers** : returns the found bluetooth hardware devices. 
 
-- checkBluetoothController() : checks if bluetooth controler exists or not
+## Events
+- **Controller** : event fires when bluetooth controller detected from system
+- **DeviceSignalLevel** : event fires when a discoverable bluetooth device's signal level detected.
+- **Device** : event fires when a new device found or a device sends its features
+- **Connected** : event fires when a new device connected value has change (connected "yes" or "no") and return the device
+- **ConnectError** : event fires when a connection error is detected (Failed to connect: org.bluez.Error.Failed)
 
-- getPairedDevices() : checks already paired devices. 
-
-- getDevicesFromController() : checks already scanned devices.
-
-- disconnect(macID) : disconnect from macID
-
-- info(macID) : checks features of device with given macID
-
-- pair(macID) : pairs with given macID
- 
-- scan(bool) : starts or stops scanning of bluetooth devices. while scan is set true, current audio playback might get crackling.. so stop scan after you found what you are searching.
-
-- discoverable(bool) : sets your raspberry or linux device's bluetooth as discoverable.
-
-- isScanning : checks if bluetoothctl is already scanning. returns true/false
-
-- isBluetoothReady : checks if our bluetooth controller ready.returns true/false
-
-- isBluetoothControlExists : checks if we have a bluetooth hardware or not. 
-
-- devices : returns the scanned and found devices as array. example output at below..
-
-- controllers : returns the found bluetooth hardware devices. 
-
-**Events**
- 
-- Controller: event fires when bluetooth controller detected from system
-
-- DeviceSignalLevel: event fires when a discoverable bluetooth device's signal level detected.
-
-- Device: event fires when a new device found or a device sends its features
-
-- Connected: event fires when a new device connected value has change (connected "yes" or "no") and return the device
-
-- ConnectError: event fires when a connection error is detected (Failed to connect: org.bluez.Error.Failed)
-
-**Installation**
-
+## Installation
 Execute: ```npm install https://github.com/jajasuperman/bluetoothctl/tarball/master```
  
-**Basic usage**
- 
+## Basic usage
 ```javascript
  var blue = require("bluetoothctl");
  blue.Bluetooth()
@@ -84,8 +83,7 @@ Execute: ```npm install https://github.com/jajasuperman/bluetoothctl/tarball/mas
  }
 ```
 
-**Sample output of controller:**
-
+## Sample output of controller:
 ```javascript
 Controllers:[
   {
@@ -96,8 +94,7 @@ Controllers:[
 ```
 
  
-**Sample output of devices:**
-
+## Sample output of devices:
 ```javascript 
 devices:[
   {
