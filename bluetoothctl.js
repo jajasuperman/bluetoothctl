@@ -224,7 +224,7 @@ exports.Bluetooth = function () {
                     if (devices[j].mac == m[1]) {
                         devices[j].paired = m[2];
                         console.log(m[1] + " paired " + m[2])
-                        self.emit(bluetoothEvents.Paired, devices[j])
+                        if (m[2] === "yes") self.emit(bluetoothEvents.Paired, devices[j]);
                     }
                 }
             }
