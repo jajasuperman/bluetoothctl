@@ -1,15 +1,11 @@
 exports = module.exports = {};
 exports.Bluetooth = function () {
-    //sudo usermod -G bluetooth -a pi
-    //recommended sudo rpi-update
-    //echo -e "connect FC:8F:90:21:12:0C \nquit" | bluetoothctl
     var self = this;
 
     var events = require('events');
     events.EventEmitter.call(self);
     self.__proto__ = events.EventEmitter.prototype;
 
-    //use ptyw.js
     var pty = require('ptyw.js/lib/pty.js');
 
     var ransi = require('strip-ansi');
@@ -37,9 +33,9 @@ exports.Bluetooth = function () {
         Controller: 'ControllerEvent',
         DeviceSignalLevel: 'DeviceSignalLevel',
         Connected: 'Connected',
+        Disconnected: 'Disconnected',
         ConnectError: 'ConnectError',
-        Paired: 'Paired',
-        Pairederror: 'PairedError'
+        Paired: 'Paired'
     }
     var mydata = "";
     var devices = [];
@@ -47,7 +43,6 @@ exports.Bluetooth = function () {
     var isBluetoothControlExists = false;
     var isBluetoothReady = false;
     var isScanning = false;
-
 
     Object.defineProperty(this, 'isBluetoothControlExists', {
         get: function () {
@@ -224,7 +219,7 @@ exports.Bluetooth = function () {
                     if (devices[j].mac == m[1]) {
                         devices[j].paired = m[2];
                         console.log(m[1] + " paired " + m[2])
-                        if (m[2] === "yes") self.emit(bluetoothEvents.Paired, devices[j]);
+                        self.emit(bluetoothEvents.Paired, devices[j])
                     }
                 }
             }
@@ -266,9 +261,13 @@ exports.Bluetooth = function () {
                         console.log(m[1] + " connected " + m[2]);
                         if (devices[j].connected != m[2]) {
                             devices[j].connected = m[2];
-                            self.emit(bluetoothEvents.Connected, devices[j]);
+                            if (m[2] === "yes") {
+                                self.emit(bluetoothEvents.Connected, devices[j]);
+                            }
+                            else if (m[2] === "no") {
+                                self.emit(bluetoothEvents.Disconnected, devices[j]);
+                            }
                         }
-                        self.emit(bluetoothEvents.Device, devices);
                     }
                 }
             }
@@ -321,7 +320,7 @@ exports.Bluetooth = function () {
                 for (j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].signal = parseInt(m[2])
-                        devices[j].available = true
+                        //devices[j].available = true
                         //console.log('signal level of:' + m[1] + ' is ' + m[2])
                         self.emit(bluetoothEvents.Device, devices)
                         self.emit(bluetoothEvents.DeviceSignalLevel, devices, m[1], m[2]);
@@ -397,8 +396,6 @@ exports.Bluetooth = function () {
     }
 }
 
-//region exports
-
 exports.agent = function (index) {
     if(index < 0 || index > 6) {index = 0;}
     this.term.write('agent ' + this.agents[index] + '\r');
@@ -419,7 +416,6 @@ exports.pairable = function (canpairable) {
 exports.discoverable = function (candiscoverable) {
     this.term.write('discoverable ' + (candiscoverable ? 'on' : 'off') + '\r');
 }
-
 
 exports.pair = function (macID) {
     this.term.write('pair ' + macID + '\r');
@@ -476,4 +472,3 @@ exports.checkBluetoothController=function(){
         return false;
     }
 }
-
