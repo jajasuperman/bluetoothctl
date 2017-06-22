@@ -450,7 +450,7 @@ exports.remove = function (macID) {
 }
 
 exports.systemAlias = function (alias) {
-  this.term.write('system-alias' + alias + '\r')
+  this.term.write('system-alias ' + alias + '\r')
 }
 
 exports.info = function (macID) {
