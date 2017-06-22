@@ -449,6 +449,10 @@ exports.remove = function (macID) {
     this.term.write('remove ' + macID + '\r');
 }
 
+exports.systemAlias = function (alias) {
+  this.term.write('system-alias' + alias + '\r')
+}
+
 exports.info = function (macID) {
     this.term.write('info ' + macID + '\r');
 }
