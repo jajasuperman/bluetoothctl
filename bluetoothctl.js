@@ -37,6 +37,7 @@ exports.Bluetooth = function () {
         ConnectError: 'ConnectError',
         Paired: 'Paired',
         NewDevice: 'NewDevice',
+        RemoveDevice: 'RemoveDevice',
         ConnectSuccessful: 'ConnectSuccessful',
         AttemptingConnect: 'AttemptingConnect'
     }
@@ -398,7 +399,8 @@ exports.Bluetooth = function () {
                     for (j = 0; j < devices.length; j++) {
                         if (devices[j].mac == m[2]) {
                             devices.splice(j, 1);
-                            console.log('deleting device ' + m[2])
+                            console.log('deleting device ' + m[2]);
+                            self.emit(bluetoothEvents.RemoveDevice, m[2]);
                         }
                     }
                 }
