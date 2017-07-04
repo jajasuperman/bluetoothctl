@@ -152,8 +152,6 @@ exports.Bluetooth = function () {
         }
 
         // LOG
-        //console.log("mydata:" + data)
-        // regexps (module with all regular expressions)
 
         checkDevice(regexps.regexdevice, data);
         checkinfo(data);
@@ -321,9 +319,9 @@ exports.Bluetooth = function () {
 
     function checkSignal(regstr, data) {
         var m;
-        while ((m = regexps.regestr.exec(data)) !== null) {
-            if (m.index === regexps.regestr.lastIndex) {
-                regexps.regestr.lastIndex++;
+        while ((m = regstr.exec(data)) !== null) {
+            if (m.index === regstr.lastIndex) {
+                regstr.lastIndex++;
             }
             //m[1] - macid
             //m[2] - signal Level
@@ -343,9 +341,9 @@ exports.Bluetooth = function () {
 
     function checkController(regstr, data) {
         var m;
-        while ((m = regexps.regestr.exec(data)) !== null) {
-            if (m.index === regexps.regestr.lastIndex) {
-                regexps.regestr.lastIndex++;
+        while ((m = regstr.exec(data)) !== null) {
+            if (m.index === regstr.lastIndex) {
+                regstr.lastIndex++;
             }
             //m[1] - macid
             //m[2] - controllername
@@ -360,9 +358,9 @@ exports.Bluetooth = function () {
 
     function checkDevice(regstr, data) {
         var m;
-        while ((m = regexps.regestr.exec(data)) !== null) {
-            if (m.index === regexps.regestr.lastIndex) {
-                regexps.regestr.lastIndex++;
+        while ((m = regstr.exec(data)) !== null) {
+            if (m.index === regstr.lastIndex) {
+                regstr.lastIndex++;
             }
             //m[1] - [NEW] or [DEL] etc..
             //m[2] - macid
