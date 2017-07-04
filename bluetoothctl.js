@@ -185,7 +185,7 @@ exports.Bluetooth = function () {
             }
             //m[1] - macid
             if (devices.length > 0) {
-                for (j = 0; j < devices.length; j++) {
+                for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         self.emit(bluetoothEvents.AttemptingConnect, devices[j]);
                     }
@@ -203,7 +203,7 @@ exports.Bluetooth = function () {
             //m[1] - macid
             //m[2] - yes or no
             if (devices.length > 0) {
-                for (j = 0; j < devices.length; j++) {
+                for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].blocked = m[2];
                         console.log(m[1] + " blocked " + m[2])
@@ -223,7 +223,7 @@ exports.Bluetooth = function () {
             //m[1] - macid
             //m[2] - yes or no
             if (devices.length > 0) {
-                for (j = 0; j < devices.length; j++) {
+                for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].paired = m[2];
                         console.log(m[1] + " paired " + m[2])
@@ -243,7 +243,7 @@ exports.Bluetooth = function () {
             //m[1] - macid
             //m[2] - yes or no
             if (devices.length > 0) {
-                for (j = 0; j < devices.length; j++) {
+                for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].trusted = m[2];
                         console.log(m[1] + " trusted " + m[2])
@@ -264,7 +264,7 @@ exports.Bluetooth = function () {
             //m[1] - macid
             //m[2] - yes or no
             if (devices.length > 0) {
-                for (j = 0; j < devices.length; j++) {
+                for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         console.log(m[1] + " connected " + m[2]);
                         if (devices[j].connected != m[2]) {
@@ -300,7 +300,7 @@ exports.Bluetooth = function () {
             //m[8] - blocked
             //m[9] - connected
             if (devices.length > 0) {
-                for (j = 0; j < devices.length; j++) {
+                for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].name = m[3]
                         devices[j].class = m[4]
@@ -325,7 +325,7 @@ exports.Bluetooth = function () {
             //m[1] - macid
             //m[2] - signal Level
             if (devices.length > 0) {
-                for (j = 0; j < devices.length; j++) {
+                for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].signal = parseInt(m[2])
                         //devices[j].available = true
@@ -367,7 +367,7 @@ exports.Bluetooth = function () {
             if (m[1] == "[DEL]") {
                 //remove from list
                 if (devices.length > 0) {
-                    for (j = 0; j < devices.length; j++) {
+                    for (var j = 0; j < devices.length; j++) {
                         if (devices[j].mac == m[2]) {
                             devices.splice(j, 1);
                             console.log('deleting device ' + m[2]);
@@ -378,7 +378,7 @@ exports.Bluetooth = function () {
             } else {
                 var found = false;
                 if (devices.length > 0) {
-                    for (j = 0; j < devices.length; j++) {
+                    for (var j = 0; j < devices.length; j++) {
                         if (devices[j].mac == m[2])found = true;
                         if (devices[j].mac == m[2] && m[1] == "[NEW]") {
                             found = false;
