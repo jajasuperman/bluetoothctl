@@ -121,7 +121,7 @@ exports.Bluetooth = function () {
 
     function checkInfo(obj) {
         if (obj.devices.length > 0) {
-            for (i = 0; i < obj.devices.length; i++) {
+            for (var i = 0; i < obj.devices.length; i++) {
                 if (obj.devices[i].paired == '' && obj.devices[i].trycount < 4) {
                     obj.devices[i].trycount += 1;
                     obj.info(obj.devices[i].mac);
