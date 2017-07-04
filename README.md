@@ -40,11 +40,16 @@ If you want to connect bluetooth speakers , mouse, keyboard etc.. you can use th
 - **controllers** : returns the found bluetooth hardware devices. 
 
 ## Events
-- **Controller** : event fires when bluetooth controller detected from system
+- **Controller** : event fires when bluetooth controller detected from system.
 - **DeviceSignalLevel** : event fires when a discoverable bluetooth device's signal level detected.
-- **Device** : event fires when a new device found or a device sends its features
-- **Connected** : event fires when a new device connected value has change (connected "yes" or "no") and return the device
-- **ConnectError** : event fires when a connection error is detected (Failed to connect: org.bluez.Error.Failed)
+- **Device** : event fires when a new device found or a device sends its features.
+- **Connected** : event fires when a new device connected value has change (connected "yes" or "no") and return the device.
+- **ConnectError** : event fires when a connection error is detected (Failed to connect: org.bluez.Error.Failed).
+- **Paired** : event fires when a device is paired.
+- **NewDevice** : event fires when a new device is detected.
+- **RemoveDevice** : event fires when a device is removed.
+- **ConnectSuccessful** : event fires when a device has been connected successfully.
+- **AttemptingConnect** : event fires when a device is a attempting to connect.
 
 ## Installation
 Execute: ```npm install https://github.com/jajasuperman/bluetoothctl/tarball/master```
