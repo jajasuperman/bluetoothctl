@@ -42,7 +42,8 @@ exports.Bluetooth = function () {
         RemoveDevice: 'RemoveDevice',
         ConnectSuccessful: 'ConnectSuccessful',
         AttemptingConnect: 'AttemptingConnect'
-    }
+    };
+
     var mydata = "";
     var devices = [];
     var controllers = [];
@@ -125,8 +126,7 @@ exports.Bluetooth = function () {
                 if (obj.devices[i].paired == '' && obj.devices[i].trycount < 4) {
                     obj.devices[i].trycount += 1;
                     obj.info(obj.devices[i].mac);
-                    console.log('checking info of ' + obj.devices[i].mac)
-
+                    console.log('checking info of ' + obj.devices[i].mac);
                 }
             }
         }
@@ -137,20 +137,17 @@ exports.Bluetooth = function () {
         term.write('type bluetoothctl\r');
     }
 
-
     term.on('data', function (data) {
         data = ransi(data).replace('[bluetooth]#', '');
         if (data.indexOf('bluetoothctl is ') !== -1 && (data.indexOf('/usr/bin/bluetoothctl') !== -1 || data.indexOf('/usr/local/bin/bluetoothctl') !== -1)) {
-            isBluetoothControlExists = true
+            isBluetoothControlExists = true;
             isBluetoothReady=true;
-            console.log('bluetooth controller exists')
+            console.log('bluetooth controller exists');
             term.write('bluetoothctl\r');
             //term.write('power on\r');
             checkInfo(self);
-            setInterval(checkInfo, 5000, self)
+            setInterval(checkInfo, 5000, self);
         }
-
-        // LOG
 
         checkDevice(regexps.regexdevice, data);
         checkinfo(regexps.regestr, data);
@@ -206,8 +203,8 @@ exports.Bluetooth = function () {
                 for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].blocked = m[2];
-                        console.log(m[1] + " blocked " + m[2])
-                        self.emit(bluetoothEvents.Device, devices)
+                        console.log(m[1] + " blocked " + m[2]);
+                        self.emit(bluetoothEvents.Device, devices);
                     }
                 }
             }
@@ -226,7 +223,7 @@ exports.Bluetooth = function () {
                 for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].paired = m[2];
-                        console.log(m[1] + " paired " + m[2])
+                        console.log(m[1] + " paired " + m[2]);
                         if (m[2] === "yes") self.emit(bluetoothEvents.Paired, devices[j]);
                     }
                 }
@@ -246,8 +243,8 @@ exports.Bluetooth = function () {
                 for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
                         devices[j].trusted = m[2];
-                        console.log(m[1] + " trusted " + m[2])
-                        self.emit(bluetoothEvents.Device, devices)
+                        console.log(m[1] + " trusted " + m[2]);
+                        self.emit(bluetoothEvents.Device, devices);
 
                     }
                 }
@@ -302,14 +299,14 @@ exports.Bluetooth = function () {
             if (devices.length > 0) {
                 for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
-                        devices[j].name = m[3]
-                        devices[j].class = m[4]
-                        devices[j].icon = m[5]
-                        devices[j].paired = m[6]
-                        devices[j].trusted = m[7]
-                        devices[j].blocked = m[8]
-                        devices[j].connected = m[9]
-                        self.emit(bluetoothEvents.Device, devices)
+                        devices[j].name = m[3];
+                        devices[j].class = m[4];
+                        devices[j].icon = m[5];
+                        devices[j].paired = m[6];
+                        devices[j].trusted = m[7];
+                        devices[j].blocked = m[8];
+                        devices[j].connected = m[9];
+                        self.emit(bluetoothEvents.Device, devices);
                     }
                 }
             }
@@ -327,10 +324,10 @@ exports.Bluetooth = function () {
             if (devices.length > 0) {
                 for (var j = 0; j < devices.length; j++) {
                     if (devices[j].mac == m[1]) {
-                        devices[j].signal = parseInt(m[2])
+                        devices[j].signal = parseInt(m[2]);
                         //devices[j].available = true
                         //console.log('signal level of:' + m[1] + ' is ' + m[2])
-                        self.emit(bluetoothEvents.Device, devices)
+                        self.emit(bluetoothEvents.Device, devices);
                         self.emit(bluetoothEvents.DeviceSignalLevel, devices, m[1], m[2]);
                     }
                 }
@@ -404,7 +401,7 @@ exports.Bluetooth = function () {
                 }
             }
         }
-        if ((regstr.exec(data)) !== null) self.emit(bluetoothEvents.Device, devices)
+        if ((regstr.exec(data)) !== null) self.emit(bluetoothEvents.Device, devices);
 
     }
 }
