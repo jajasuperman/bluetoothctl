@@ -1,13 +1,13 @@
-### Linux command line bluetoothctl wrapper for nodejs
-Powerful command line utulity bluetoothctl for discovery, connect,disconnect, scan, pair etc.. 
+# Linux command line bluetoothctl wrapper for nodejs
+Powerful command line utility bluetoothctl for discovery, connect, disconnect, scan, pair, etc.. 
 If you want to connect bluetooth speakers , mouse, keyboard etc.. you can use this module. 
 
-### Requirements
+## Requirements
 - Linux command line.
 - Bluetooth controller.
 - `bluetoothctl` package installed (comes with `bluez` package).
 
-### Features:
+## Features:
 - **agent(agentId)** : set agent
     - 0 = "DisplayOnly"
     - 1 = "DisplayYesNo"
