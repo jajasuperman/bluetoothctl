@@ -1,3 +1,6 @@
+var regexps = require('./regexps');
+
+
 exports = module.exports = {};
 exports.Bluetooth = function () {
     var self = this;
@@ -150,57 +153,30 @@ exports.Bluetooth = function () {
 
         // LOG
         //console.log("mydata:" + data)
+        // regexps (module with all regular expressions)
 
-        var regexdevice = /(\[[A-Z]{3,5}\])?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(?!RSSI)(?!Class)(?!Icon)(?!not available)(?!UUIDs:)(?!Connected)(?!Paired)(?![0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})(?!\s)(.+)/gm;
-        var regexcontroller = /\[[A-Z]{3,5}\]?\s?Controller\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(?!Discovering)(.+) /gm;
-        var regexsignal = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sRSSI:\s-(.+)/gm;
-        var regexinfo = /Device ([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\r?\n?\t?Name: (.+)\r?\n?\t?Alias: (.+)\r?\n?\t?Class: (.+)\r?\n?\t?Icon: (.+)\r?\n?\t?Paired: (.+)\r?\n?\t?Trusted: (.+)\r?\n?\t?Blocked: (.+)\r?\n?\t?Connected: (.+)\r?\n?\t?/gmi;
-
-        var regexconnected = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sConnected:\s([a-z]{2,3})/gm;
-        var regextrusted = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sTrusted:\s([a-z]{2,3})/gm;
-        var regexpaired = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sPaired:\s([a-z]{2,3})/gm;
-        var regexblocked = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sBlocked:\s([a-z]{2,3})/gm;
-        var regexNotAvailable = /Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\snot\savailable/gm;
-        var regexAttemptingConnect = /Attempting\sto\sconnect\sto\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})/gm;
-
-        var regexscanon1 = 'Discovery started';
-        var regexscanon2 = 'Failed to start discovery: org.bluez.Error.InProgress';
-        var regexscanon3 = 'Discovering: yes';
-
-        var regexscanoff1 = 'Discovery stopped';
-        var regexscanoff2 = 'Discovering: no';
-        var regexscanoff3 = 'Failed to stop discovery: org.bluez.Error.Failed';
-
-        var failToConnect = 'Failed to connect: org.bluez.Error.Failed';
-        var failToPair = 'Failed to pair: org.bluez.Error.AuthenticationFailed';
-
-        var regexAuthorizeService = '[agent] Authorize service';
-        var regexConfirmPasskey = '[agent] Confirm passkey';
-
-        var connectSuccess = 'Connection successful';
-
-        checkDevice(regexdevice, data);
+        checkDevice(regexps.regexdevice, data);
         checkinfo(data);
-        checkSignal(regexsignal, data);
-        checkController(regexcontroller, data);
-        checkConnected(regexconnected, data);
-        checkPaired(regexpaired, data);
-        checkTrusted(regextrusted, data);
-        checkBlocked(regexblocked, data);
-        checkAttempt(regexAttemptingConnect, data);
+        checkSignal(regexps.regexsignal, data);
+        checkController(regexps.regexcontroller, data);
+        checkConnected(regexps.regexconnected, data);
+        checkPaired(regexps.regexpaired, data);
+        checkTrusted(regexps.regextrusted, data);
+        checkBlocked(regexps.regexblocked, data);
+        checkAttempt(regexps.regexAttemptingConnect, data);
 
-        if (data.indexOf(regexscanoff1) !== -1 || data.indexOf(regexscanoff2) !== -1 || data.indexOf(regexscanoff3) !== -1) {
+        if (data.indexOf(regexps.regexscanoff1) !== -1 || data.indexOf(regexps.regexscanoff2) !== -1 || data.indexOf(regexps.regexscanoff3) !== -1) {
             isScanning = false;
         }
-        if (data.indexOf(regexscanon1) !== -1 || data.indexOf(regexscanon2) !== -1 || data.indexOf(regexscanon3) !== -1) {
+        if (data.indexOf(regexps.regexscanon1) !== -1 || data.indexOf(regexps.regexscanon2) !== -1 || data.indexOf(regexps.regexscanon3) !== -1) {
             isScanning = true;
         }
-        if (data.indexOf(failToConnect) !== -1 || data.indexOf(failToPair) !== -1 || data.indexOf(regexNotAvailable) !== -1) self.emit(bluetoothEvents.ConnectError);
+        if (data.indexOf(regexps.failToConnect) !== -1 || data.indexOf(regexps.failToPair) !== -1 || data.indexOf(regexps.regexNotAvailable) !== -1) self.emit(bluetoothEvents.ConnectError);
 
-        if (data.indexOf(regexAuthorizeService) !== -1 || data.indexOf(regexConfirmPasskey) !== -1) {
+        if (data.indexOf(regexps.regexAuthorizeService) !== -1 || data.indexOf(regexps.regexConfirmPasskey) !== -1) {
             term.write('yes\r');
         }
-        if (data.indexOf(connectSuccess) !== -1) self.emit(bluetoothEvents.ConnectSuccess);
+        if (data.indexOf(regexps.connectSuccess) !== -1) self.emit(bluetoothEvents.ConnectSuccess);
 
     })
 
@@ -313,10 +289,8 @@ exports.Bluetooth = function () {
 
     function checkinfo(data) {
 
-        var regstr = /Device ([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\r?\n?\t?Name: (.+)\r?\n?\t?Alias: (.+)\r?\n?\t?Class: (.+)\r?\n?\t?Icon: (.+)\r?\n?\t?Paired: (.+)\r?\n?\t?Trusted: (.+)\r?\n?\t?Blocked: (.+)\r?\n?\t?Connected: (.+)\r?\n?\t?/gmi;
-
-        while ((m = regstr.exec(data)) !== null) {
-            if (m.index === regstr.lastIndex) {
+        while ((m = regexps.regestr.exec(data)) !== null) {
+            if (m.index === regexps.regestr.lastIndex) {
                 regstr.lastIndex++;
             }
             //m[1] - macid
@@ -347,9 +321,9 @@ exports.Bluetooth = function () {
 
     function checkSignal(regstr, data) {
         var m;
-        while ((m = regstr.exec(data)) !== null) {
-            if (m.index === regstr.lastIndex) {
-                regstr.lastIndex++;
+        while ((m = regexps.regestr.exec(data)) !== null) {
+            if (m.index === regexps.regestr.lastIndex) {
+                regexps.regestr.lastIndex++;
             }
             //m[1] - macid
             //m[2] - signal Level
@@ -369,9 +343,9 @@ exports.Bluetooth = function () {
 
     function checkController(regstr, data) {
         var m;
-        while ((m = regstr.exec(data)) !== null) {
-            if (m.index === regstr.lastIndex) {
-                regstr.lastIndex++;
+        while ((m = regexps.regestr.exec(data)) !== null) {
+            if (m.index === regexps.regestr.lastIndex) {
+                regexps.regestr.lastIndex++;
             }
             //m[1] - macid
             //m[2] - controllername
@@ -386,9 +360,9 @@ exports.Bluetooth = function () {
 
     function checkDevice(regstr, data) {
         var m;
-        while ((m = regstr.exec(data)) !== null) {
-            if (m.index === regstr.lastIndex) {
-                regstr.lastIndex++;
+        while ((m = regexps.regestr.exec(data)) !== null) {
+            if (m.index === regexps.regestr.lastIndex) {
+                regexps.regestr.lastIndex++;
             }
             //m[1] - [NEW] or [DEL] etc..
             //m[2] - macid
