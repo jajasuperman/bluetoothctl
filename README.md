@@ -87,6 +87,8 @@ Execute: ```npm install https://github.com/jajasuperman/bluetoothctl/tarball/mas
      },20000)
  }
 ```
+## TODO
+- Fix terminal module, which sometimes split the output, so devices information is split also.
 
 ## Sample output of controller:
 ```javascript
