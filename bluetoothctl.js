@@ -1,6 +1,5 @@
 var regexps = require('./regexps');
 
-
 exports = module.exports = {};
 exports.Bluetooth = function () {
     var self = this;
@@ -154,7 +153,7 @@ exports.Bluetooth = function () {
         // LOG
 
         checkDevice(regexps.regexdevice, data);
-        checkinfo(data);
+        checkinfo(regexps.regestr, data);
         checkSignal(regexps.regexsignal, data);
         checkController(regexps.regexcontroller, data);
         checkConnected(regexps.regexconnected, data);
@@ -285,10 +284,10 @@ exports.Bluetooth = function () {
         }
     }
 
-    function checkinfo(data) {
+    function checkinfo(regstr, data) {
 
-        while ((m = regexps.regestr.exec(data)) !== null) {
-            if (m.index === regexps.regestr.lastIndex) {
+        while ((m = regstr.exec(data)) !== null) {
+            if (m.index === regstr.lastIndex) {
                 regstr.lastIndex++;
             }
             //m[1] - macid
