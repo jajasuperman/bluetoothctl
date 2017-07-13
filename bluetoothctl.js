@@ -39,7 +39,8 @@ exports.Bluetooth = function () {
         NewDevice: 'NewDevice',
         RemoveDevice: 'RemoveDevice',
         ConnectSuccessful: 'ConnectSuccessful',
-        AttemptingConnect: 'AttemptingConnect'
+        AttemptingConnect: 'AttemptingConnect',
+        Discoverable: 'Discoverable'
     }
     var mydata = "";
     var devices = [];
@@ -152,9 +153,10 @@ exports.Bluetooth = function () {
         //console.log("mydata:" + data)
 
         var regexdevice = /(\[[A-Z]{3,5}\])?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(?!RSSI)(?!Class)(?!Icon)(?!not available)(?!UUIDs:)(?!Connected)(?!Paired)(?![0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})(?!\s)(.+)/gm;
-        var regexcontroller = /\[[A-Z]{3,5}\]?\s?Controller\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(?!Discovering)(.+) /gm;
+        var regexcontroller = /\[[A-Z]{3,5}\]?\s?Controller\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(?!(Discovering|Discoverable))(.+) /gm;
         var regexsignal = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sRSSI:\s-(.+)/gm;
         var regexinfo = /Device ([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\r?\n?\t?Name: (.+)\r?\n?\t?Alias: (.+)\r?\n?\t?Class: (.+)\r?\n?\t?Icon: (.+)\r?\n?\t?Paired: (.+)\r?\n?\t?Trusted: (.+)\r?\n?\t?Blocked: (.+)\r?\n?\t?Connected: (.+)\r?\n?\t?/gmi;
+        var regexdiscoverable = /\[[A-Z]{3,5}\]?\s?Controller\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\s(Discoverable: )(\w{2,3})/gm;
 
         var regexconnected = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sConnected:\s([a-z]{2,3})/gm;
         var regextrusted = /\[[A-Z]{3,5}\]?\s?Device\s([0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2}[\.:-][0-9A-F]{1,2})\sTrusted:\s([a-z]{2,3})/gm;
@@ -188,6 +190,7 @@ exports.Bluetooth = function () {
         checkTrusted(regextrusted, data);
         checkBlocked(regexblocked, data);
         checkAttempt(regexAttemptingConnect, data);
+        checkDiscoverable(regexdiscoverable, data);
 
         if (data.indexOf(regexscanoff1) !== -1 || data.indexOf(regexscanoff2) !== -1 || data.indexOf(regexscanoff3) !== -1) {
             isScanning = false;
@@ -218,6 +221,18 @@ exports.Bluetooth = function () {
                     }
                 }
             }
+        }
+    }
+
+    function checkDiscoverable(regstr, data) {
+        var m;
+        while ((m = regstr.exec(data)) !== null) {
+            if (m.index === regstr.lastIndex) {
+                regstr.lastIndex++;
+            }
+            //m[1] - macid
+            //m[3] - yes or no
+            self.emit(bluetoothEvents.Discoverable, m[3]);
         }
     }
 
@@ -374,9 +389,9 @@ exports.Bluetooth = function () {
                 regstr.lastIndex++;
             }
             //m[1] - macid
-            //m[2] - controllername
+            //m[3] - controllername
             controllers = [];
-            controllers.push({mac: m[1], name: m[2]});
+            controllers.push({mac: m[1], name: m[3]});
             term.write('power on\r');
             self.emit(bluetoothEvents.Controller, controllers);
             //console.log('controller found:' + m[1])
@@ -434,13 +449,13 @@ exports.Bluetooth = function () {
             }
         }
         if ((regstr.exec(data)) !== null) self.emit(bluetoothEvents.Device, devices)
-
     }
 }
 
 exports.agent = function (index) {
     if(index < 0 || index > 6) {index = 0;}
     this.term.write('agent ' + this.agents[index] + '\r');
+    this.term.write('default-agent\r');
 }
 
 exports.defaultAgent = function () {
